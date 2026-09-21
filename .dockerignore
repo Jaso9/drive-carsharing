@@ -1,0 +1,15 @@
+.venv
+.env
+*.db
+*.log
+tmp
+.git
+__pycache__
+.pytest_cache
+.ruff_cache
+backups
+openai-site
+node_modules
+dist
+tests
+docs

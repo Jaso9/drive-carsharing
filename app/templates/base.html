@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{title}} — Драйв</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body data-page="{{page}}">
+    <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+    <header class="site-header">
+      <a class="logo" href="/" aria-label="Драйв — главная"
+        >драйв<span>↗</span></a
+      >
+      <nav aria-label="Основная навигация">
+        <a href="/cars">Автомобили</a>
+        <a href="/trips">Мои поездки</a>
+        <a href="/support">Поддержка</a>
+        <a href="/profile" id="profile-link" hidden>Профиль</a>
+        <a href="/admin" id="admin-link" hidden>Управление</a>
+      </nav>
+      <div class="header-account">
+        <a class="primary nav-login" id="login-link" href="/login">Войти</a
+        ><button id="logout" hidden>Выйти</button>
+      </div>
+    </header>
+    <main id="main-content" tabindex="-1">
+      {{subnav}}
+      <div id="message" role="status" hidden></div>
+      {{content}}
+    </main>
+    <footer class="site-footer">
+      <a class="logo" href="/">драйв ↗</a>
+      <nav aria-label="Дополнительная навигация">
+        <a href="/cars">Автомобили</a
+        ><a href="/how-it-works">Как это работает</a
+        ><a href="/support">Поддержка</a>
+      </nav>
+      <span
+        >20 минут бесплатной брони.<br />Стоимость поездки округляется вверх до
+        полной минуты.</span
+      >
+    </footer>
+    <script src="/static/app.js" defer></script>
+    {{scripts}}
+  </body>
+</html>

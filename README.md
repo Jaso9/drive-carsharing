@@ -1,0 +1,108 @@
+# Драйв — итоговый проект на FastAPI
+
+Сервис каршеринга: отдельные страницы, REST API, аккаунты, бронирования, поездки, история, поддержка и кабинет администратора.
+
+**Основная версия — этот каталог.** `openai-site/`, если присутствует рядом, — независимый порт на JavaScript Worker / D1 для OpenAI Sites. FastAPI не импортирует его, не использует его базу и не требует его сборки. В итоговый архив он не входит. Корневые `package.json` и `pnpm-lock.yaml` относятся только к проверкам JavaScript интерфейса.
+
+## Быстрый запуск
+
+Python 3.12+. Все команды выполняются из корня проекта.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item .env.example .env
+```
+
+Для новой установки замените `SECRET_KEY` в `.env` случайной строкой, например результатом `python -c "import secrets; print(secrets.token_urlsafe(48))"`. Существующую `.env` не перезаписывайте.
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m app.cli seed
+.\start.ps1
+```
+
+`seed` добавляет четыре демонстрационные машины без дубликатов. Последующие запуски — только `start.ps1`: он применяет миграции и запускает `app.main:app`.
+
+Сайт: http://127.0.0.1:8000. Swagger: http://127.0.0.1:8000/docs. Node.js, отдельный frontend-сервер и сборка для запуска **не нужны**.
+
+## Минимальная структура
+
+```text
+app/
+  main.py           сборка FastAPI-приложения, middleware, health/readiness
+  pages.py          маршруты HTML-страниц и проверка доступа
+  models.py         таблицы SQLAlchemy и ограничения целостности
+  schemas.py        модели входных и выходных данных
+  api/              accounts, cars, rentals, support, admin
+  core/             config, db, security
+  services/         бизнес-операции аренды и транзакции
+  templates/        общий каркас и отдельные HTML-страницы
+  static/           CSS и JavaScript без сборки
+  cli.py            демоданные и назначение администратора
+  maintenance.py    резервное копирование SQLite
+migrations/         история схемы Alembic
+tests/              Python-проверки и tests/ui для JavaScript
+docs/operations.md  запуск на сервере и обслуживание
+scripts/package.py  сборка чистого исходного архива
+requirements.txt    зафиксированные зависимости приложения
+requirements-dev.txt дополнительные зависимости тестов и линтера
+pyproject.toml      настройки pytest и Ruff
+start.ps1           одна точка локального запуска
+```
+
+Это модульный монолит: HTML и API обслуживает один FastAPI-процесс, база по умолчанию — SQLite. Маршруты принимают и проверяют запросы; сервис аренды отвечает за состояния, стоимость и транзакции; SQLAlchemy — за хранение. Для небольших CRUD-операций используется сессия БД прямо в маршруте. Отдельные repository-обёртки, микросервисы и frontend-фреймворк здесь не нужны.
+
+`.venv/`, `node_modules/`, `tmp/`, `backups/`, `carsharing.db`, `.env` и логи — локальные рабочие данные, а не исходники. База и секреты сохраняются отдельно от версии кода.
+
+## Страницы
+
+| URL | Содержимое |
+| --- | --- |
+| `/` | Главная |
+| `/cars` | Каталог и бронирование |
+| `/login` | Вход и регистрация |
+| `/trips` | Текущая аренда, история, расчёт стоимости |
+| `/support` | Обращения и ответы |
+| `/profile` | Имя и смена пароля |
+| `/how-it-works` | Правила сервиса |
+| `/admin` | Обращения, поездки, сводка, журнал |
+| `/admin/fleet` | Управление автомобилями |
+
+Личные страницы требуют входа, управление — роли администратора. Назначение роли существующему аккаунту:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli admin your@email.com
+```
+
+## Проверка
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m ruff check app tests scripts migrations
+.\.venv\Scripts\python.exe -m alembic check
+```
+
+Дополнительно, при наличии Node.js и pnpm:
+
+```powershell
+pnpm install --frozen-lockfile
+pnpm test
+```
+
+Тесты проверяют права, отзыв сессий, расчёт стоимости, конкурентное бронирование, миграции существующей БД, резервные копии и отдельные страницы. DOM-проверки JavaScript не заменяют визуальную проверку браузером.
+
+## Итоговый архив
+
+```powershell
+.\.venv\Scripts\python.exe scripts/package.py
+```
+
+Результат — `dist/drive-fastapi.zip`, самостоятельный исходный проект с инструкциями, зависимостями, миграциями и тестами. Архив создаётся по явному списку разрешённых файлов: без OpenAI-версии, окружений, `.env`, баз, логов и резервных копий.
+
+## Эксплуатация и ограничения
+
+Подробности: [docs/operations.md](docs/operations.md). Бронь действует 20 минут, стоимость рассчитывается в целых копейках с округлением времени вверх до минуты. Тариф и данные автомобиля фиксируются в истории. Пароли — Argon2; JWT привязан к отзываемой серверной сессии, браузер использует HttpOnly-cookie.
+
+Реальные платежи, проверка водительских документов, GPS и замки не подключены. Расчёт поездки не является кассовым чеком. Docker-конфигурация подготовлена; запуск контейнера и PostgreSQL в текущем окружении не проверялись.

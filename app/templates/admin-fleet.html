@@ -1,0 +1,103 @@
+<section id="fleet">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">АВТОПАРК</p>
+      <h1>Управление автопарком</h1>
+    </div>
+    <select id="category" aria-label="Класс автомобиля">
+      <option value="">Все классы</option>
+      <option value="economy">Эконом</option>
+      <option value="comfort">Комфорт</option>
+      <option value="business">Бизнес</option>
+    </select>
+  </div>
+  <div class="filters">
+    <label class="search-label"
+      >Поиск автомобиля<input
+        id="search"
+        type="search"
+        placeholder="Марка, модель или адрес"
+    /></label>
+    <label
+      >Сортировка<select id="sort">
+        <option value="default">По умолчанию</option>
+        <option value="price_asc">Сначала дешевле</option>
+        <option value="price_desc">Сначала дороже</option>
+        <option value="fuel">Больше топлива</option>
+      </select></label
+    >
+    <label class="check"
+      ><input id="available" type="checkbox" /> Только доступные</label
+    >
+  </div>
+  <p id="result-count" aria-live="polite"></p>
+  <div id="catalog-error" class="error-panel" role="alert" hidden>
+    <p id="catalog-error-text"></p>
+    <button id="catalog-retry">Повторить загрузку</button>
+  </div>
+  <div id="cars" class="grid" aria-busy="true"></div>
+</section>
+<section id="admin" class="panel">
+  <div>
+    <p class="eyebrow">АДМИНИСТРАТОР</p>
+    <h2>Добавить автомобиль</h2>
+  </div>
+  <form id="car-form">
+    <label>Марка<input name="brand" required /></label>
+    <label>Модель<input name="model" required /></label>
+    <label>Госномер<input name="plate" required minlength="3" /></label>
+    <label>Адрес<input name="address" required minlength="3" /></label>
+    <label
+      >Класс<select name="category">
+        <option value="economy">Эконом</option>
+        <option value="comfort">Комфорт</option>
+        <option value="business">Бизнес</option>
+      </select></label
+    >
+    <label
+      >Тариф, копеек/мин<input
+        name="rate_kopecks"
+        type="number"
+        min="1"
+        value="900"
+        required
+    /></label>
+    <button class="primary">Добавить</button>
+  </form>
+</section>
+<dialog id="edit-car-dialog" aria-labelledby="edit-car-title">
+  <form id="edit-car-form">
+    <h2 id="edit-car-title">Редактировать автомобиль</h2>
+    <label>Марка<input name="brand" required maxlength="60" /></label>
+    <label>Модель<input name="model" required maxlength="60" /></label>
+    <label
+      >Госномер<input name="plate" required minlength="3" maxlength="20"
+    /></label>
+    <label
+      >Адрес<input name="address" required minlength="3" maxlength="200"
+    /></label>
+    <label
+      >Класс<select name="category">
+        <option value="economy">Эконом</option>
+        <option value="comfort">Комфорт</option>
+        <option value="business">Бизнес</option>
+      </select></label
+    >
+    <label
+      >Топливо, %<input name="fuel" type="number" min="0" max="100" required
+    /></label>
+    <label
+      >Тариф, копеек/мин<input
+        name="rate_kopecks"
+        type="number"
+        min="1"
+        max="100000"
+        required
+    /></label>
+    <p class="form-status" role="status"></p>
+    <div class="actions">
+      <button class="primary">Сохранить</button>
+      <button type="button" id="edit-car-close">Отмена</button>
+    </div>
+  </form>
+</dialog>

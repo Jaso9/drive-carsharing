@@ -1,0 +1,58 @@
+<section id="fleet">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">АВТОПАРК</p>
+      <h1>Машина под ваши планы</h1>
+    </div>
+    <select id="category" aria-label="Класс автомобиля">
+      <option value="">Все классы</option>
+      <option value="economy">Эконом</option>
+      <option value="comfort">Комфорт</option>
+      <option value="business">Бизнес</option>
+    </select>
+  </div>
+  <div class="filters">
+    <label class="search-label"
+      >Поиск автомобиля<input
+        id="search"
+        type="search"
+        placeholder="Марка, модель или адрес"
+    /></label>
+    <label
+      >Сортировка<select id="sort">
+        <option value="default">По умолчанию</option>
+        <option value="price_asc">Сначала дешевле</option>
+        <option value="price_desc">Сначала дороже</option>
+        <option value="fuel">Больше топлива</option>
+      </select></label
+    >
+    <label class="check"
+      ><input id="available" type="checkbox" /> Только доступные</label
+    >
+  </div>
+  <p id="result-count" aria-live="polite"></p>
+  <div id="catalog-error" class="error-panel" role="alert" hidden>
+    <p id="catalog-error-text"></p>
+    <button id="catalog-retry">Повторить загрузку</button>
+  </div>
+  <div id="cars" class="grid" aria-busy="true"></div>
+</section>
+<dialog id="reserve-dialog" aria-labelledby="reserve-title">
+  <form id="reserve-form">
+    <p class="eyebrow">ПОДТВЕРЖДЕНИЕ БРОНИ</p>
+    <h2 id="reserve-title"></h2>
+    <p id="reserve-address"></p>
+    <div class="quote">
+      <strong id="reserve-rate"></strong><span>20 минут бесплатной брони</span>
+    </div>
+    <p>
+      После начала поездки каждая начатая минута оплачивается полностью. Тариф
+      фиксируется при бронировании.
+    </p>
+    <p class="form-status" role="status"></p>
+    <div class="actions">
+      <button class="primary">Подтвердить бронирование</button>
+      <button type="button" id="reserve-close">Назад</button>
+    </div>
+  </form>
+</dialog>

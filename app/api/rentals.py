@@ -1,0 +1,109 @@
+from html import escape
+from math import ceil
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import HTMLResponse
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
+
+from app.core.db import get_db
+from app.core.security import current_user
+from app.models import Rental, User
+from app.schemas import FinishInput, RentalOut, ReserveInput
+from app.services import rentals
+from app.services.rentals import expire_reservations, rental_view
+
+router = APIRouter(prefix="/api/rentals", tags=["Аренда"])
+
+
+@router.get("", response_model=list[RentalOut], tags=["Аренда"])
+def my_rentals(
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+):
+    rentals.expire_reservations(db)
+    rows = db.scalars(
+        select(Rental)
+        .where(Rental.user_id == user.id)
+        .order_by(Rental.id.desc())
+        .offset(offset)
+        .limit(limit)
+    ).all()
+    return [rentals.rental_view(db, rental) for rental in rows]
+
+
+@router.post("", response_model=RentalOut, status_code=201, tags=["Аренда"])
+def reserve(data: ReserveInput, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return rentals.rental_view(
+        db, rentals.reserve(db, user.id, data.car_id, data.expected_rate_kopecks)
+    )
+
+
+@router.post("/{rental_id}/start", response_model=RentalOut, tags=["Аренда"])
+def start(rental_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return rentals.rental_view(db, rentals.transition(db, user.id, rental_id, "start"))
+
+
+@router.post("/{rental_id}/cancel", response_model=RentalOut, tags=["Аренда"])
+def cancel(rental_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return rentals.rental_view(db, rentals.transition(db, user.id, rental_id, "cancel"))
+
+
+@router.post("/{rental_id}/finish", response_model=RentalOut, tags=["Аренда"])
+def finish(
+    rental_id: int,
+    data: FinishInput,
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db),
+):
+    return rentals.rental_view(db, rentals.transition(db, user.id, rental_id, "finish", data))
+
+
+@router.get("/summary")
+def summary(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    count, total = db.execute(
+        select(func.count(Rental.id), func.coalesce(func.sum(Rental.total_kopecks), 0)).where(
+            Rental.user_id == user.id, Rental.status == "completed"
+        )
+    ).one()
+    return {"completed_count": count, "total_kopecks": total}
+
+
+@router.get("/current", response_model=RentalOut | None)
+def current(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    expire_reservations(db)
+    rental = db.scalar(
+        select(Rental).where(Rental.user_id == user.id, Rental.status.in_(["reserved", "active"]))
+    )
+    return rental_view(db, rental) if rental else None
+
+
+@router.get("/{rental_id}/receipt", response_class=HTMLResponse)
+def receipt(rental_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    rental = db.get(Rental, rental_id)
+    if not rental or rental.user_id != user.id:
+        raise HTTPException(404, "Поездка не найдена")
+    if rental.status != "completed":
+        raise HTTPException(409, "Итоги доступны после завершения поездки")
+    trip = rental_view(db, rental)
+    minutes = max(1, ceil((rental.finished_at - rental.started_at).total_seconds() / 60))
+
+    def date(value):
+        return value.strftime("%d.%m.%Y %H:%M:%S") + " UTC"
+
+    rows = [
+        ("Автомобиль", trip["car_name"]),
+        ("Госномер", trip["plate"]),
+        ("Начало поездки", date(rental.started_at)),
+        ("Завершение", date(rental.finished_at)),
+        ("Адрес начала", rental.pickup_address or "Не сохранён для этой поездки"),
+        ("Адрес завершения", rental.finish_address or "Не сохранён для этой поездки"),
+        ("Оплачиваемое время", f"{minutes} мин"),
+        ("Тариф", f"{rental.rate_kopecks / 100:.2f} ₽/мин"),
+    ]
+    body = "".join(f"<dt>{escape(label)}</dt><dd>{escape(value)}</dd>" for label, value in rows)
+    return HTMLResponse(
+        f'<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Итоги поездки №{rental.id} — Драйв</title><link rel="stylesheet" href="/static/receipt.css"></head><body><main><a href="/trips">← Мои поездки</a><p class="brand">драйв ↗</p><h1>Итоги поездки №{rental.id}</h1><dl>{body}</dl><div class="total">Стоимость <strong>{rental.total_kopecks / 100:.2f} ₽</strong></div><p>Каждая начатая минута округляется вверх. Минимум — одна минута.</p><p>Расчёт стоимости поездки. Не является кассовым чеком или подтверждением оплаты.</p><button id="print">Распечатать / сохранить PDF</button></main><script src="/static/receipt.js"></script></body></html>'
+    )

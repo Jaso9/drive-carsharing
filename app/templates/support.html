@@ -1,0 +1,44 @@
+<section id="support-section">
+  <p class="eyebrow">МЫ РЯДОМ</p>
+  <h1>Поддержка</h1>
+  <div class="panel">
+    <div>
+      <h3>Расскажите, что произошло</h3>
+      <p>
+        Опишите вопрос или проблему с автомобилем. Ответ появится в списке
+        обращений ниже.
+      </p>
+      <p>При непосредственной угрозе жизни звоните 112.</p>
+    </div>
+    <form id="support-form">
+      <label
+        >Тема<input
+          name="subject"
+          required
+          minlength="3"
+          maxlength="120"
+          placeholder="Например, вопрос по стоимости"
+      /></label>
+      <label
+        >Номер поездки, если есть<input name="rental_id" type="number" min="1"
+      /></label>
+      <label
+        >Сообщение<textarea
+          name="message"
+          rows="4"
+          required
+          minlength="10"
+          maxlength="4000"
+        ></textarea>
+      </label>
+      <button class="primary">Отправить обращение</button>
+      <p class="form-status" role="status"></p>
+    </form>
+  </div>
+  <div id="support-list"></div>
+  <div class="actions">
+    <button id="support-prev" type="button">Назад</button>
+    <button id="support-next" type="button">Далее</button>
+    <button id="support-refresh" type="button">Обновить ответы</button>
+  </div>
+</section>

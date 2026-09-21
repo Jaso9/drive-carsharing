@@ -1,0 +1,29 @@
+<section id="auth" class="panel">
+  <div>
+    <p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p>
+    <h1>Начните свою поездку</h1>
+    <p>Для бронирования войдите или создайте аккаунт.</p>
+  </div>
+  <form id="auth-form">
+    <label
+      >Email<input name="email" type="email" required autocomplete="username"
+    /></label>
+    <label
+      >Пароль<input
+        name="password"
+        type="password"
+        minlength="8"
+        maxlength="128"
+        required
+        autocomplete="current-password"
+    /></label>
+    <label id="name-label" hidden
+      >Имя<input name="name" minlength="2" maxlength="100" autocomplete="name"
+    /></label>
+    <div class="actions">
+      <button class="primary" id="submit-auth">Войти</button>
+      <button type="button" id="toggle-auth">Создать аккаунт</button>
+    </div>
+    <p class="form-status" role="status"></p>
+  </form>
+</section>

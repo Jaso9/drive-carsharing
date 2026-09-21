@@ -1,0 +1,40 @@
+<section id="trips">
+  <div id="active-trip" hidden></div>
+  <p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p>
+  <h1 id="greeting">Мои поездки</h1>
+  <div id="trip-summary" class="trip-summary" hidden></div>
+  <div id="rentals" class="trip-list">
+    <p>Войдите, чтобы увидеть поездки.</p>
+  </div>
+</section>
+<div id="history-pages" class="actions" hidden>
+  <button id="history-prev">Предыдущие</button><span id="history-page"></span>
+  <button id="history-next">Следующие</button>
+</div>
+<dialog id="finish-dialog" aria-labelledby="finish-title">
+  <form id="finish-form">
+    <h2 id="finish-title">Завершить поездку</h2>
+    <p>Укажите фактический адрес парковки и остаток топлива.</p>
+    <p class="form-status" role="status"></p>
+    <label
+      >Адрес парковки<input
+        name="address"
+        minlength="3"
+        maxlength="200"
+        required
+    /></label>
+    <label
+      >Топливо, %<input
+        name="fuel"
+        type="number"
+        min="0"
+        max="100"
+        required
+        value="70"
+    /></label>
+    <div class="actions">
+      <button class="primary">Завершить</button>
+      <button type="button" id="close-dialog">Назад</button>
+    </div>
+  </form>
+</dialog>

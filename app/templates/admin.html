@@ -1,0 +1,46 @@
+<section id="operations">
+  <p class="eyebrow">УПРАВЛЕНИЕ СЕРВИСОМ</p>
+  <h1>Кабинет администратора</h1>
+  <div id="admin-summary" class="trip-summary"></div>
+  <details open>
+    <summary>Обращения пользователей</summary>
+    <label
+      >Статус<select id="ticket-status">
+        <option value="open">Новые</option>
+        <option value="answered">С ответом</option>
+        <option value="closed">Закрытые</option>
+        <option value="">Все</option>
+      </select></label
+    >
+    <div id="admin-tickets"></div>
+    <div class="actions">
+      <button id="inbox-prev">Назад</button>
+      <button id="inbox-next">Далее</button>
+    </div>
+  </details>
+  <details>
+    <summary>Поиск поездок</summary>
+    <form id="admin-rentals-form">
+      <label
+        >Номер поездки, госномер или email<input
+          id="admin-rentals-search"
+          maxlength="100"
+      /></label>
+      <button>Найти</button>
+    </form>
+    <div id="admin-rentals"></div>
+    <div class="actions">
+      <button id="admin-rentals-prev">Назад</button>
+      <button id="admin-rentals-next">Далее</button>
+    </div>
+  </details>
+  <details>
+    <summary>Журнал действий</summary>
+    <button id="audit-refresh">Обновить журнал</button>
+    <div id="audit-list"></div>
+    <div class="actions">
+      <button id="audit-prev">Назад</button>
+      <button id="audit-next">Далее</button>
+    </div>
+  </details>
+</section>

@@ -1,0 +1,46 @@
+<section id="profile" class="panel">
+  <div>
+    <p class="eyebrow">ВАШ АККАУНТ</p>
+    <h1>Профиль и безопасность</h1>
+    <p id="profile-email"></p>
+    <p>После смены пароля все устройства выйдут из аккаунта.</p>
+  </div>
+  <div class="account-forms">
+    <form id="profile-form">
+      <label
+        >Как к вам обращаться<input
+          name="name"
+          required
+          minlength="2"
+          maxlength="100"
+          autocomplete="name"
+      /></label>
+      <button class="primary">Сохранить имя</button>
+      <p class="form-status" role="status"></p>
+    </form>
+    <details>
+      <summary>Изменить пароль</summary>
+      <form id="password-form">
+        <label
+          >Текущий пароль<input
+            name="current_password"
+            type="password"
+            required
+            maxlength="128"
+            autocomplete="current-password"
+        /></label>
+        <label
+          >Новый пароль<input
+            name="new_password"
+            type="password"
+            required
+            minlength="8"
+            maxlength="128"
+            autocomplete="new-password"
+        /></label>
+        <button>Изменить пароль</button>
+        <p class="form-status" role="status"></p>
+      </form>
+    </details>
+  </div>
+</section>
