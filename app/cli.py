@@ -17,7 +17,7 @@ def main():
     args = parser.parse_args()
     with SessionLocal() as db:
         if args.command == "seed":
-            for brand, model, plate, category, address, rate in [
+            for brand, model, plate, category, address, rate, image in [
                 (
                     "Kia",
                     "Rio",
@@ -25,6 +25,7 @@ def main():
                     "economy",
                     "Санкт-Петербург, ул. Профессора Попова, 5",
                     900,
+                    "images/kiario.png",
                 ),
                 (
                     "Hyundai",
@@ -33,6 +34,7 @@ def main():
                     "economy",
                     "Санкт-Петербург, Невский проспект, 28",
                     950,
+                    "images/hsolaris.png",
                 ),
                 (
                     "Skoda",
@@ -41,6 +43,7 @@ def main():
                     "comfort",
                     "Санкт-Петербург, Большой проспект П.С., 84",
                     1400,
+                    "images/skodaoctavia.png",
                 ),
                 (
                     "BMW",
@@ -49,9 +52,14 @@ def main():
                     "business",
                     "Санкт-Петербург, Петроградская набережная, 18",
                     2200,
+                    "images/BMW-3.png"
                 ),
             ]:
-                if not db.scalar(select(Car).where(Car.plate == plate)):
+                car = db.scalar(select(Car).where(Car.plate == plate))
+
+                if car:
+                    car.image = image
+                else:
                     db.add(
                         Car(
                             brand=brand,
@@ -61,6 +69,7 @@ def main():
                             address=address,
                             rate_kopecks=rate,
                             fuel=85,
+                            image=image,
                         )
                     )
         else:

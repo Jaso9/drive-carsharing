@@ -40,7 +40,7 @@ class CarOut(CarInput):
     model_config = ConfigDict(from_attributes=True)
     id: int
     status: str
-
+    image: str | None = None
 
 class ReserveInput(BaseModel):
     car_id: int

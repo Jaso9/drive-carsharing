@@ -143,10 +143,58 @@ async function refresh() {
       : "Ничего не найдено. Попробуйте изменить фильтры.";
     $("cars").innerHTML =
       cars
-        .map(
-          (c) =>
-            `<article class="card"><span class="badge">${labels[c.category]} · ${c.fuel < 10 && c.status === "available" ? "Ожидает заправки" : labels[c.status]}</span><div class="car-icon" aria-hidden="true">${carIllustration(c.category)}</div><h3>${escape(c.brand)} ${escape(c.model)}</h3><p>${escape(c.plate)} · Топливо ${c.fuel}%</p><p>${escape(c.address)}</p><div class="price">${money(c.rate_kopecks)} <small>/ мин</small></div><button class="primary" ${screen === "admin-fleet" ? "hidden" : ""} data-reserve="${c.id}" ${c.status !== "available" || c.fuel < 10 ? "disabled" : ""}>${user ? "Забронировать" : "Войти и забронировать"}</button>${screen === "admin-fleet" && user?.is_admin && ["available", "maintenance"].includes(c.status) ? `<button data-edit-car="${c.id}">Редактировать</button><button data-service="${c.id}" data-status="${c.status === "available" ? "maintenance" : "available"}">${c.status === "available" ? "На обслуживание" : "Вернуть в автопарк"}</button>` : ""}</article>`,
-        )
+  .map(
+    (c) =>
+      `<article class="card">
+        <span class="badge">${labels[c.category]} · ${
+          c.fuel < 10 && c.status === "available"
+            ? "Ожидает заправки"
+            : labels[c.status]
+        }</span>
+
+        <div class="car-image">
+          ${
+            c.image
+              ? `<img src="/static/${escape(c.image)}" alt="${escape(
+                  c.brand + " " + c.model,
+                )}">`
+              : carIllustration(c.category)
+          }
+        </div>
+
+        <h3>${escape(c.brand)} ${escape(c.model)}</h3>
+        <p>${escape(c.plate)} · Топливо ${c.fuel}%</p>
+        <p>${escape(c.address)}</p>
+
+        <div class="price">
+          ${money(c.rate_kopecks)} <small>/ мин</small>
+        </div>
+
+        <button
+          class="primary"
+          ${screen === "admin-fleet" ? "hidden" : ""}
+          data-reserve="${c.id}"
+          ${c.status !== "available" || c.fuel < 10 ? "disabled" : ""}
+        >
+          ${user ? "Забронировать" : "Войти и забронировать"}
+        </button>
+
+        ${
+          screen === "admin-fleet" &&
+          user?.is_admin &&
+          ["available", "maintenance"].includes(c.status)
+            ? `<button data-edit-car="${c.id}">Редактировать</button>
+               <button data-service="${c.id}" data-status="${
+                 c.status === "available" ? "maintenance" : "available"
+               }">${
+                 c.status === "available"
+                   ? "На обслуживание"
+                   : "Вернуть в автопарк"
+               }</button>`
+            : ""
+        }
+      </article>`,
+  )
         .join("") || "<p>В этом классе пока нет автомобилей.</p>";
   }
   if (user && $("rentals")) {
